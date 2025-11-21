@@ -30,4 +30,8 @@ Repositorio con un backend Express para crear Payment Intents (Checkout Sessions
    ```
    Corre en `http://localhost:5173`.
 
+Producción (ejemplo):
+- Backend: `https://fintoc-qufl.onrender.com`
+- Frontend: `http://fintoc-test-ian.s3-website-us-east-1.amazonaws.com/`
+
 Sigue cada README para más detalles de endpoints y flujo del widget.

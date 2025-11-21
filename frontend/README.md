@@ -38,7 +38,8 @@ npm run dev
 4. Completa el flujo sandbox en el widget.
 
 ## Producción / deploy
-- API backend de ejemplo: `https://fintoc-qufl.onrender.com`.
+- API backend de ejemplo (producción): `https://fintoc-qufl.onrender.com`.
+- Frontend desplegado (ejemplo): `http://fintoc-test-ian.s3-website-us-east-1.amazonaws.com/`.
 - Usa `.env.production` para construir:
   ```bash
   npm run build

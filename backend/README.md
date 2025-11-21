@@ -24,6 +24,9 @@ PORT=3000
 npm start
 # Servidor en http://localhost:3000
 ```
+Producción:
+- Backend desplegado (ejemplo): `https://fintoc-qufl.onrender.com`
+Frontend vitrina: `http://fintoc-test-ian.s3-website-us-east-1.amazonaws.com/`
 
 ## Endpoints
 - `POST /api/payment_intents`
