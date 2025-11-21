@@ -23,7 +23,8 @@ Repositorio con un backend Express para crear Payment Intents (Checkout Sessions
 2. Frontend:
    ```bash
    cd frontend
-   cp .env.local.example .env.local  # o crea y agrega VITE_FINTOC_PUBLIC_KEY
+   cp .env.local.example .env.local  # agrega VITE_API_URL y VITE_FINTOC_PUBLIC_KEY
+   # Opcional prod: .env.production con VITE_API_URL=https://fintoc-qufl.onrender.com
    npm install
    npm run dev
    ```

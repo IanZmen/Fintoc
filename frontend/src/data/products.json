@@ -1,0 +1,58 @@
+[
+  {
+    "id": "chips_1",
+    "name": "Papas fritas clásicas",
+    "price": 1200,
+    "image": "https://img.freepik.com/vector-gratis/dibujos-animados-papas-fritas-felices_1308-172286.jpg?semt=ais_hybrid&w=740&q=80",
+    "category": "snacks"
+  },
+  {
+    "id": "coke_1",
+    "name": "Pelayo",
+    "price": 1000,
+    "image": "https://www.concierto.cl/wp-content/uploads/2019/01/bebida-tula.jpg",
+    "category": "bebidas"
+  },
+  {
+    "id": "chocolate_1",
+    "name": "Barra de chocolate",
+    "price": 1500,
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1IZdFP-Suh7u1WgOxMc3UdFcS_hyISVmOXg&s",
+    "category": "dulces"
+  },
+  {
+    "id": "water_1",
+    "name": "Agua mineral 500ml",
+    "price": 800,
+    "image": "https://cdn.milenio.com/uploads/media/2020/07/01/preocupacion-usuarios-parque-agua-estancada.jpg",
+    "category": "bebidas"
+  },
+  {
+    "id": "nuts_1",
+    "name": "Mix de frutos secos",
+    "price": 2200,
+    "image": "https://dialprix.es/wp-content/uploads/blog_fesecos.png",
+    "category": "snacks"
+  },
+  {
+    "id": "cookies_1",
+    "name": "Galletas de avena",
+    "price": 1300,
+    "image": "https://i.pinimg.com/236x/27/66/48/2766480413a41cc6e4d33f35d7845f13.jpg",
+    "category": "dulces"
+  },
+  {
+    "id": "energy_1",
+    "name": "Bebida energética",
+    "price": 1800,
+    "image": "https://img.redbull.com/images/c_crop,w_3200,h_1600,x_0,y_51/c_auto,w_1200,h_600/f_auto,q_auto/redbullcom/2018/07/11/eab58038-a45c-4123-94aa-7cdac2f82c40/sonka-muroya-air-race-abu-dhabi",
+    "category": "bebidas"
+  },
+  {
+    "id": "candy_1",
+    "name": "Caramelos surtidos",
+    "price": 900,
+    "image": "https://s.alicdn.com/@sc04/kf/H81b6e82f398f474fafaf585cbb707c28b/OEM-ODM-Factory-Wholesale-Gummi-Sweets-Sour-Halal-Assorted-Candies-Fruit-Snacks-Lollies-Gummy-Candy-Jelly-Gummy-Candy.jpeg_300x300.jpg",
+    "category": "dulces"
+  }
+]

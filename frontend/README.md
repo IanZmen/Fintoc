@@ -1,10 +1,10 @@
-# Frontend Fintoc Checkout (React + Vite)
+# Pepestore (React + Vite + Fintoc)
 
-Interfaz mínima para crear una sesión de pago contra el backend y abrir el widget de Fintoc con el `session_token`.
+Mini tienda de snacks que consume el backend en `http://localhost:3000` para crear sesiones de pago y abrir el widget de Fintoc.
 
 ## Requisitos
-- Backend corriendo en `http://localhost:3000` con el endpoint `POST /api/payment_intents`.
 - Node.js 18+.
+- Backend con endpoint `POST /api/payment_intents` disponible.
 
 ## Instalación
 ```bash
@@ -13,10 +13,16 @@ npm install
 ```
 
 ## Variables de entorno
-Crea `.env.local` (puedes copiar `.env.local.example`) con tu public key y (opcional) base URL del backend:
+- Desarrollo: copia `.env.local.example` a `.env.local` y ajusta.
+- Producción: usa `.env.production` (ejemplo incluido) con tu URL y public key live.
 ```
+# Ejemplo local
+VITE_API_URL=http://localhost:3000
 VITE_FINTOC_PUBLIC_KEY=pk_test_xxx
-VITE_API_BASE_URL=http://localhost:3000
+
+# Ejemplo prod (fintoc-qufl.onrender.com)
+# VITE_API_URL=https://fintoc-qufl.onrender.com
+# VITE_FINTOC_PUBLIC_KEY=pk_live_xxx
 ```
 
 ## Ejecutar en desarrollo
@@ -25,16 +31,25 @@ npm run dev
 # Vite en http://localhost:5173
 ```
 
-## Flujo de uso
-1. Llena el formulario con `amount` y `description`.
-2. Al enviar, se llama al backend (`/api/payment_intents`) y se guarda `session_token`.
-3. Aparece un botón para abrir el widget de Fintoc; se carga `https://js.fintoc.com/v1.0.0/widget.js`.
-4. Al completar el pago se muestra el estado de éxito; si el usuario cierra el widget sin pagar, se muestra el estado de salida.
+## Flujo para probar
+1. Agrega productos al carrito desde el catálogo (3 columnas, imágenes con fallback).
+2. Abre el carrito con el botón superior “Carrito”.
+3. Pulsa “Pagar con Fintoc”: crea la sesión y abre el widget; no se muestra el token en UI.
+4. Completa el flujo sandbox en el widget.
+
+## Producción / deploy
+- API backend de ejemplo: `https://fintoc-qufl.onrender.com`.
+- Usa `.env.production` para construir:
+  ```bash
+  npm run build
+  ```
+  Los estáticos quedan en `dist/`.
 
 ## Estructura
-- `src/api/fintocClient.js`: consumo del backend (createPaymentIntent).
-- `src/hooks/useCheckoutSession.js`: maneja loading/error/sessionData.
-- `src/components/PaymentForm.jsx`: formulario de pago.
-- `src/components/PaymentStatus.jsx`: estados y payloads.
-- `src/components/FintocWidgetLauncher.jsx`: carga el script y abre el widget.
-- `src/App.jsx`: orquesta el flujo con el public key (`import.meta.env.VITE_FINTOC_PUBLIC_KEY`).
+- Datos: `src/data/products.json` catálogo hardcodeado.
+- API: `src/api/client.js` (`createCheckoutSession` con `VITE_API_URL`).
+- Hooks: `src/hooks/useCart.js` (carrito/total) y `src/hooks/useCheckout.js` (checkout + session token).
+- Componentes: `Cart.jsx`, `ProductList.jsx`, `FintocWidgetLauncher.jsx`.
+- Páginas: `src/pages/LandingPage.jsx` y `src/pages/ProductsPage.jsx`.
+- Routing: `src/App.jsx` (usa React Router para navegar entre Landing y Productos; el carrito solo se muestra en Productos).
+- Estilos: globales en `src/index.css`, layout/páginas en `src/App.css`, navegación en `src/styles/nav.css`.

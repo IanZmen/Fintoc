@@ -1,16 +1,28 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
+import { Routes, Route, Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import './App.css';
-import { PaymentForm } from './components/PaymentForm';
-import { PaymentStatus } from './components/PaymentStatus';
-import { FintocWidgetLauncher } from './components/FintocWidgetLauncher';
-import { useCheckoutSession } from './hooks/useCheckoutSession';
-import { getPublicKey } from './api/fintocClient';
+import './styles/nav.css';
+import { Cart } from './components/Cart';
+import { useCart } from './hooks/useCart';
+import { useCheckout } from './hooks/useCheckout';
+import { getPublicKey } from './api/client';
+import { LandingPage } from './pages/LandingPage';
+import { ProductsPage } from './pages/ProductsPage';
+
+const VIEWS = {
+  landing: '/',
+  products: '/productos',
+};
 
 function App() {
-  const { createSession, loading, error, sessionData } = useCheckoutSession();
-  const [status, setStatus] = useState('idle');
-  const [widgetResult, setWidgetResult] = useState(null);
+  const { items, total, addItem, removeItem, clearCart } = useCart();
+  const { loading, sessionData, startCheckout } = useCheckout();
   const [envError, setEnvError] = useState(null);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [autoOpenWidget, setAutoOpenWidget] = useState(false);
+  const [paymentResult, setPaymentResult] = useState(null);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const publicKey = useMemo(() => {
     try {
@@ -21,69 +33,136 @@ function App() {
     }
   }, []);
 
-  useEffect(() => {
-    if (envError) {
-      setStatus('error');
-      return;
-    }
+  const cartCount = useMemo(
+    () => items.reduce((acc, item) => acc + item.quantity, 0),
+    [items]
+  );
 
-    if (loading) {
-      setStatus('creating');
-    } else if (!loading && sessionData && !error) {
-      setStatus('ready');
-    } else if (!loading && error) {
-      setStatus('error');
-    }
-  }, [loading, sessionData, error, envError]);
+  const cartQuantities = useMemo(() => {
+    const map = {};
+    items.forEach((item) => {
+      map[item.id] = item.quantity;
+    });
+    return map;
+  }, [items]);
 
-  const handleCreateSession = async (payload) => {
-    setWidgetResult(null);
+  const handleCheckout = async () => {
+    if (total <= 0 || loading) return;
     try {
-      await createSession(payload);
-    } catch (_) {
-      // error ya manejado en el hook
+      await startCheckout(total, 'Compra en Pepestore');
+      setCartOpen(false);
+      setAutoOpenWidget(true);
+    } catch (e) {
+      // error seteado en hook
     }
   };
 
-  const handleWidgetSuccess = (payload) => {
-    setWidgetResult({ status: 'success', payload, eventType: 'success' });
-    setStatus('payment_success');
+  const handleWidgetSuccess = () => {
+    clearCart();
+    setPaymentResult({
+      status: 'success',
+      title: 'Pago completado',
+      message: 'Tu pago fue procesado con éxito.',
+    });
   };
 
-  const handleWidgetExit = (payload) => {
-    setWidgetResult({ status: 'exit', payload, eventType: 'exit' });
-    setStatus('payment_exit');
+  const handleWidgetExit = () => {
+    setPaymentResult({
+      status: 'cancelled',
+      title: 'Pago no completado',
+      message: 'Cerraste el widget antes de finalizar el pago.',
+    });
   };
+
+  const isProducts = location.pathname === VIEWS.products;
 
   return (
     <div className="app">
-      <header>
-        <h1>Fintoc Checkout (Sandbox)</h1>
-        <p>
-          Crea una sesión en el backend y abre el widget con tu
-          <code> session_token</code>.
-        </p>
-      </header>
+      <nav className="nav">
+        <div className="brand">Pepestore</div>
+        <div className="nav-actions">
+          <Link
+            className={location.pathname === VIEWS.landing ? 'nav-link active' : 'nav-link'}
+            to={VIEWS.landing}
+          >
+            Inicio
+          </Link>
+          <Link
+            className={location.pathname === VIEWS.products ? 'nav-link active' : 'nav-link'}
+            to={VIEWS.products}
+          >
+            Productos
+          </Link>
+          {isProducts && (
+            <button className="cart-button" onClick={() => setCartOpen(true)}>
+              Ir al carrito ({cartCount})
+            </button>
+          )}
+        </div>
+      </nav>
 
-      <main className="layout">
-        <PaymentForm onSubmit={handleCreateSession} disabled={loading} />
+      {envError && (
+        <div className="section error-box">
+          <p className="error">{envError}</p>
+        </div>
+      )}
 
-        <PaymentStatus
-          status={status}
-          sessionData={sessionData}
-          error={error || envError}
-          widgetResult={widgetResult}
+      <Routes>
+        <Route
+          path={VIEWS.landing}
+          element={
+            <LandingPage
+              onGoProducts={() => navigate(VIEWS.products)}
+              onOpenCart={() => {
+                navigate(VIEWS.products);
+                setCartOpen(true);
+              }}
+              cartCount={cartCount}
+              total={total}
+            />
+          }
         />
+        <Route
+          path={VIEWS.products}
+          element={
+            <ProductsPage
+              onAdd={addItem}
+              onRemove={removeItem}
+              cartQuantities={cartQuantities}
+              sessionData={sessionData}
+              publicKey={publicKey}
+              autoOpenWidget={autoOpenWidget}
+              onAutoOpenHandled={() => setAutoOpenWidget(false)}
+              onSuccess={handleWidgetSuccess}
+              onExit={handleWidgetExit}
+            />
+          }
+        />
+        <Route path="*" element={<Navigate to={VIEWS.landing} replace />} />
+      </Routes>
 
-        {sessionData && publicKey && (
-          <FintocWidgetLauncher
-            sessionToken={sessionData.session_token}
-            publicKey={publicKey}
-            onSuccess={handleWidgetSuccess}
-            onExit={handleWidgetExit}
-          />
-        )}
-      </main>
+      {isProducts && (
+        <Cart
+          items={items}
+          total={total}
+          onRemove={removeItem}
+          onCheckout={handleCheckout}
+          open={cartOpen}
+          onClose={() => setCartOpen(false)}
+        />
+      )}
+
+      {paymentResult && (
+        <div className="modal-overlay" onClick={() => setPaymentResult(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3 className={paymentResult.status === 'success' ? 'success' : 'error'}>
+              {paymentResult.title}
+            </h3>
+            <p>{paymentResult.message}</p>
+            <button onClick={() => setPaymentResult(null)}>Cerrar</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
